@@ -2,6 +2,6 @@ import { createApp , h } from 'vue'
 
 createApp({
   render () {
-    return h('div', 'hello')
+    return h('div', 'hello vite')
   },
 }).mount('#app')
