@@ -9,7 +9,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@vue/reactivity": "^3.5.14",
+    "@vue/runtime-core": "^3.5.14",
+    "@vue/runtime-dom": "^3.5.14",
+    "@vue/shared": "^3.5.14",
     "koa": "^3.0.0",
+    "reactivity": "link:/@vue/reactivity",
+    "shared": "link:/@vue/shared",
     "vue": "^3.5.13"
   },
   "devDependencies": {
