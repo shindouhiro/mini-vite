@@ -9,6 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@vue/compiler-dom": "^3.5.14",
+    "@vue/compiler-sfc": "^3.5.14",
     "@vue/reactivity": "^3.5.14",
     "@vue/runtime-core": "^3.5.14",
     "@vue/runtime-dom": "^3.5.14",

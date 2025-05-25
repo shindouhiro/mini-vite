@@ -4,23 +4,24 @@ import path, { join } from 'path'
 import { fileURLToPath } from 'url';
 const app = new Koa()
 const __dirname = path.dirname(new URL(import.meta.url).pathname)
-
+import { parse } from '@vue/compiler-sfc'
+import { compile } from '@vue/compiler-dom'
 
 
 app.use(async (ctx) => {
   // ctx.body = 'Hello World'
-  const { url } = ctx.request
+  const { url, query } = ctx.request
   console.log({
     url,
   })
   if (url === '/') {
     ctx.type = "text/html"
-    ctx.body = fs.readFileSync(path.join(__dirname,'./index.html'), "utf8")
+    ctx.body = fs.readFileSync(path.join(__dirname, './index.html'), "utf8")
   } else if (url.endsWith('.js')) {// 
     const p = path.join(__dirname, url)// 
     ctx.type = "application/javascript"// 
-      const content = fs.readFileSync(p, 'utf8');
-      ctx.body = rewiereImport(content);
+    const content = fs.readFileSync(p, 'utf8');
+    ctx.body = rewiereImport(content);
   } else if (url.endsWith('.css')) {// 
     ctx.type = "text/css"// 
     ctx.body = fs.readFileSync(`.${url}`, 'utf8')// 
@@ -51,6 +52,32 @@ app.use(async (ctx) => {
     // const module = await import(p)
     // ctx.type = "application/javascript"
     // ctx.body = `export default ${JSON.stringify(module)}`
+  } else if (url.indexOf('.vue') > -1) {
+    const type = query.type
+    const p = path.join(__dirname, url.split('?')[0])
+    const content = fs.readFileSync(p, 'utf8')
+    const { descriptor } = parse(content)
+    if (!type) {
+      const scriptContent = descriptor.script?.content
+      const script = scriptContent.replace('export default', 'const __script =')
+      ctx.type = "application/javascript"
+      ctx.body = `
+      ${rewiereImport(script)}
+      import { render as __render } from '${url}?type=template'
+      __script.render = __render
+      export default __script
+      `
+    } else if (type === 'template') {
+      const templateContent = descriptor.template?.content
+      const render = compile(templateContent, {
+        mode: 'module'
+      }).code
+      ctx.type = "application/javascript"
+      ctx.body = rewiereImport(render)
+
+    }
+
+
   }
 })
 
